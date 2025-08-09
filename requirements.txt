@@ -1,0 +1,28 @@
+# FastAPI backend
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+slowapi>=0.1.9
+
+# AI APIs
+openai>=1.0.0
+google-genai>=0.8.0
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Frontend
+streamlit>=1.28.0
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Optional: Enhanced search capabilities
+# sentence-transformers>=2.2.0  # Uncomment for fallback RAG system
+# scikit-learn>=1.3.0           # Uncomment for advanced similarity metrics
