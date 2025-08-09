@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+openai
+google-genai
+streamlit
+requests
+pydantic
+python-dotenv
+# Rate limiting
+slowapi
+# Enhanced dependencies for RAG and improved features
+numpy
+# Additional dependencies for enhanced features (Python 3.8+ has these built-in)
+# dataclasses; python_version<"3.7"  # Removed - using Python 3.8+
+# typing-extensions  # Removed - using Python 3.8+

@@ -1,0 +1,124 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Alice Johnson",
+      "skills": ["Python", "Django", "AWS", "Docker"],
+      "experience_years": 5,
+      "projects": ["E-commerce Platform", "Healthcare Dashboard"],
+      "availability": "available"
+    },
+    {
+      "id": 2,
+      "name": "Ravi Singh",
+      "skills": ["JavaScript", "React", "Node.js"],
+      "experience_years": 4,
+      "projects": ["Mobile Banking App", "Retail POS"],
+      "availability": "available"
+    },
+    {
+      "id": 3,
+      "name": "Dr. Sarah Chen",
+      "skills": ["Python", "TensorFlow", "PyTorch", "ML"],
+      "experience_years": 6,
+      "projects": ["Medical Diagnosis Platform", "X-ray Analysis"],
+      "availability": "available"
+    },
+    {
+      "id": 4,
+      "name": "Michael Rodriguez",
+      "skills": ["Python", "scikit-learn", "Pandas", "HIPAA"],
+      "experience_years": 4,
+      "projects": ["Patient Risk Prediction System"],
+      "availability": "on_notice"
+    },
+    {
+      "id": 5,
+      "name": "Priya Das",
+      "skills": ["React Native", "iOS", "Android"],
+      "experience_years": 3,
+      "projects": ["Delivery App", "Healthcare Companion"],
+      "availability": "available"
+    },
+    {
+      "id": 6,
+      "name": "Sandeep Kumar",
+      "skills": ["AWS", "Kubernetes", "Terraform", "Docker"],
+      "experience_years": 7,
+      "projects": ["Cloud Migration", "CI/CD Pipelines"],
+      "availability": "busy"
+    },
+    {
+      "id": 7,
+      "name": "Anna Petrova",
+      "skills": ["TypeScript", "React", "Next.js"],
+      "experience_years": 5,
+      "projects": ["SaaS Dashboard", "Analytics Portal"],
+      "availability": "available"
+    },
+    {
+      "id": 8,
+      "name": "Liu Wei",
+      "skills": ["Go", "Microservices", "gRPC", "Docker"],
+      "experience_years": 6,
+      "projects": ["Real-time Analytics"],
+      "availability": "available"
+    },
+    {
+      "id": 9,
+      "name": "Carlos Mendes",
+      "skills": ["Python", "Flask", "PostgreSQL"],
+      "experience_years": 2,
+      "projects": ["Internal Tools"],
+      "availability": "available"
+    },
+    {
+      "id": 10,
+      "name": "Fatima Zahra",
+      "skills": ["Java", "Spring Boot", "AWS"],
+      "experience_years": 8,
+      "projects": ["Banking Backoffice"],
+      "availability": "busy"
+    },
+    {
+      "id": 11,
+      "name": "Sofia Pereira",
+      "skills": ["Data Engineering", "Spark", "Airflow", "Python"],
+      "experience_years": 5,
+      "projects": ["ETL Platform"],
+      "availability": "available"
+    },
+    {
+      "id": 12,
+      "name": "Akash Mehta",
+      "skills": ["DevOps", "Docker", "AWS", "CI/CD"],
+      "experience_years": 4,
+      "projects": ["Kubernetes Ops"],
+      "availability": "available"
+    },
+    {
+      "id": 13,
+      "name": "Emily Nguyen",
+      "skills": ["React Native", "Expo", "UX"],
+      "experience_years": 3,
+      "projects": ["Wellness App"],
+      "availability": "on_notice"
+    },
+    {
+      "id": 14,
+      "name": "Omar Khaled",
+      "skills": ["AWS", "Docker", "Node.js", "Express"],
+      "experience_years": 4,
+      "projects": ["E-commerce Backend"],
+      "availability": "available"
+    },
+    {
+      "id": 15,
+      "name": "Priyanka Verma",
+      "skills": ["Python", "NLP", "spaCy", "Medical NLP"],
+      "experience_years": 5,
+      "projects": ["Clinical Notes Processor"],
+      "availability": "available"
+    }
+  ]
+}
