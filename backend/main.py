@@ -85,7 +85,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8501", "http://127.0.0.1:8501"],  # More secure CORS - only allow Streamlit
+    allow_origins=[
+        "http://localhost:8501", 
+        "http://127.0.0.1:8501",
+        "https://*.onrender.com",  # Allow all Render subdomains
+        "*"  # For development - remove in production for better security
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST"],  # Only allow necessary methods
     allow_headers=["*"],
