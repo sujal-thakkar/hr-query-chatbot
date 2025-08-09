@@ -88,7 +88,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8501", 
         "http://127.0.0.1:8501",
-        "https://hr-chatbot-frontend.onrender.com",  # Your exact frontend URL
+        "https://hr-chatbot-frontend-fp6j.onrender.com",  # Your exact frontend URL
         "https://*.onrender.com"  # Backup for all Render domains
     ],
     allow_credentials=True,
