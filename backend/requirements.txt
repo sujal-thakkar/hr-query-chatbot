@@ -1,15 +1,19 @@
-fastapi
-uvicorn
-openai
-google-genai
-streamlit
-requests
-pydantic
-python-dotenv
-# Rate limiting
-slowapi
-# Enhanced dependencies for RAG and improved features
-numpy
-# Additional dependencies for enhanced features (Python 3.8+ has these built-in)
-# dataclasses; python_version<"3.7"  # Removed - using Python 3.8+
-# typing-extensions  # Removed - using Python 3.8+
+# Backend deployment requirements
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+slowapi>=0.1.9
+
+# AI APIs
+openai>=1.0.0
+google-genai>=0.8.0
+
+# Data processing
+numpy>=1.24.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Production server
+gunicorn>=21.2.0
