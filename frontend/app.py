@@ -152,6 +152,7 @@ st.markdown("""
 
 # Get API base URL
 API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8000")
+st.write(f"Connecting to API at: {API_BASE}")
 
 # Initialize session state
 if 'search_history' not in st.session_state:
