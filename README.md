@@ -42,14 +42,14 @@ graph TB
     E --> G[👥 Employee Dataset]
     D --> H[🤖 Gemini 2.5 Flash]
     
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
-    style G fill:#e3f2fd
-    style H fill:#fff8e1
+    style A fill:#e1f5fe,color:#0d1117
+    style B fill:#f3e5f5,color:#0d1117
+    style C fill:#e8f5e8,color:#0d1117
+    style D fill:#fff3e0,color:#0d1117
+    style E fill:#fce4ec,color:#0d1117
+    style F fill:#f1f8e9,color:#0d1117
+    style G fill:#e3f2fd,color:#0d1117
+    style H fill:#fff8e1,color:#0d1117
 ```
 
 ### 🔧 **Core Components**
