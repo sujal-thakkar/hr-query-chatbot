@@ -324,9 +324,64 @@ GET /employees/search?skill=Python&min_experience=4&availability=available
 4. "Find AWS experts available immediately"
 
 ### Screenshots
-- Chat Interface: Clean, intuitive Streamlit UI
-- API Documentation: Automatic FastAPI docs with interactive testing
-- Search Results: Structured employee profiles with skills and experience
+To keep things compact and beautiful, desktop and mobile screenshots are shown side-by-side with consistent captions and sizing.
+
+#### Chat Interface (Desktop + Mobile)
+
+<table>
+  <tr>
+    <td align="center" width="66%" valign="top">
+      <img src="https://github.com/user-attachments/assets/a20ba77e-a163-4a58-bd7f-e1c6d47e6d3d" alt="Chat interface — desktop view" title="Chat interface — desktop view" width="100%" />
+      <br />
+      <sub>Desktop — Clean, intuitive Streamlit UI</sub>
+    </td>
+    <td align="center" width="34%" valign="top">
+      <img src="https://github.com/user-attachments/assets/d182f0df-7aaa-4bf7-a402-63558af72972" alt="Chat interface — mobile conversation view" title="Chat interface — mobile conversation view" width="48%" />
+      <img src="https://github.com/user-attachments/assets/3d8d673c-0ff6-40ef-8f3a-b1a3d0ffc18c" alt="Chat interface — mobile results view" title="Chat interface — mobile results view" width="48%" />
+      <br />
+      <sub>Mobile — Conversation and results</sub>
+    </td>
+  </tr>
+  
+</table>
+
+#### API Documentation (Grid)
+
+<table>
+  <tr>
+    <td align="center" width="50%" valign="top">
+  <img src="https://github.com/user-attachments/assets/f6c1f328-e975-4251-8c45-9aa19613460d" alt="Swagger UI — API docs overview" title="Swagger UI — API docs overview" width="100%" />
+      <br />
+      <sub>API docs — Overview</sub>
+    </td>
+    <td align="center" width="50%" valign="top">
+  <img src="https://github.com/user-attachments/assets/ebe10617-1790-4f2c-9880-6c01e3741e04" alt="Swagger UI — Endpoint list and try-out" title="Swagger UI — Endpoint list and Try it out" width="100%" />
+      <br />
+      <sub>API docs — Endpoint list & Try it out</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top">
+  <img src="https://github.com/user-attachments/assets/452d599a-2bd7-468a-bd86-825822511e00" alt="Swagger UI — Endpoint details" title="Swagger UI — Endpoint details" width="100%" />
+      <br />
+      <sub>API docs — Endpoint details</sub>
+    </td>
+    <td align="center" width="50%" valign="top">
+  <img src="https://github.com/user-attachments/assets/ff070cd9-adf5-4f42-b36b-01d50ecb3705" alt="Swagger UI — Schemas and models" title="Swagger UI — Schemas and models" width="100%" />
+      <br />
+      <sub>API docs — Schemas & Models</sub>
+    </td>
+  </tr>
+</table>
+
+#### Search Results (Desktop)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/aeaf8d00-47fe-4130-b033-827bab84abbb" alt="Search results — structured employee profiles with skills and experience" title="Search results — structured employee profiles with skills and experience" width="85%" />
+  <br />
+  <sub>Desktop — Structured employee profiles with skills, projects, and experience</sub>
+</p>
+
 
 ## Development Notes
 - Built in 2 days following rapid prototyping principles
