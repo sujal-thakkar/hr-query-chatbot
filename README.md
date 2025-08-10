@@ -324,7 +324,6 @@ GET /employees/search?skill=Python&min_experience=4&availability=available
 4. "Find AWS experts available immediately"
 
 ### Screenshots
-To keep things compact and beautiful, desktop and mobile screenshots are shown side-by-side with consistent captions and sizing.
 
 #### Chat Interface (Desktop + Mobile)
 
