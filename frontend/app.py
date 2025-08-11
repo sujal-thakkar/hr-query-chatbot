@@ -10,6 +10,7 @@ from typing import Dict, Any, List
 # Load environment variables
 load_dotenv()
 
+
 st.set_page_config(
     page_title="HR Resource Query Chatbot", 
     page_icon="🤖",
@@ -151,7 +152,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Get API base URL
-API_BASE = os.getenv("API_BASE", "https://hr-query-chatbot-bdg8.onrender.com/")
+API_BASE = os.getenv("API_BASE", "http://localhost:8000")
 
 # Initialize session state
 if 'search_history' not in st.session_state:

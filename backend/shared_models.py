@@ -1,21 +1,23 @@
-# backend/shared_models.py
-"""
-Shared data models and types used across the RAG implementations
-"""
-from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from pydantic import BaseModel
+from typing import List, Dict, Any
 
-@dataclass
-class SearchResult:
-    """Unified search result structure used by all RAG implementations"""
-    employee: Dict[str, Any]
+# --- Data Models ---
+
+class Employee(BaseModel):
+    id: int
+    name: str
+    experience_years: int
+    skills: List[str]
+    projects: List[str]
+    availability: str
+
+class SearchResult(BaseModel):
+    employee: Employee
     relevance_score: float
     match_reasons: List[str]
     confidence: float
 
-@dataclass 
-class ProcessedQuery:
-    """Processed query structure from query processor"""
+class ProcessedQuery(BaseModel):
     original: str
     cleaned: str
     keywords: List[str]

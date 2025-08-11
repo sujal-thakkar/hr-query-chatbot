@@ -1,3 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Static import check
+        run: |
+          python -c "import importlib;import sys;mods=['fastapi','pydantic','numpy'];[importlib.import_module(m) for m in mods];print('Imports OK')"
+      - name: Run lightweight tests (no external APIs)
+        run: |
+          python - << 'PY'
+          import sys, json
+          sys.path.append('backend')
+          from query_processor import QueryProcessor
+          qp = QueryProcessor()
+          res = qp.process_query('Senior Python developer with 5+ years ML experience in healthcare')
+          assert 'python' in [s.lower() for s in res.skill_terms]
+          assert 'healthcare' in res.domain_context
+          print('QueryProcessor sanity test passed')
+          PY
 name: CI/CD Pipeline
 
 on:

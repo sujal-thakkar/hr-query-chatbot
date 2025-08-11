@@ -91,7 +91,8 @@ class GeminiClient(AIClientInterface):
         
         # Secure API key validation
         if not self.api_key and not api_key:
-            raise ValueError("GEMINI_API_KEY environment variable required. Please set your Gemini API key.")
+            # Don't raise here; allow application to start in degraded mode
+            logger.warning("⚠️ GEMINI_API_KEY not found. Gemini features will be disabled.")
         
         if self.api_key and GEMINI_AVAILABLE:
             try:
@@ -338,16 +339,22 @@ class AIClientManager:
     def _initialize_clients(self):
         """Initialize all available AI clients"""
         # Try to initialize Gemini first (better limits)
-        gemini_client = GeminiClient()
-        if gemini_client.is_available():
-            self.clients['gemini'] = gemini_client
-            logger.info("🤖 Gemini client ready")
+        try:
+            gemini_client = GeminiClient()
+            if gemini_client.is_available():
+                self.clients['gemini'] = gemini_client
+                logger.info("🤖 Gemini client ready")
+        except Exception as e:
+            logger.warning(f"⚠️ Skipping Gemini client initialization: {e}")
         
         # Try to initialize OpenAI as fallback
-        openai_client = OpenAIClient()
-        if openai_client.is_available():
-            self.clients['openai'] = openai_client
-            logger.info("🤖 OpenAI client ready")
+        try:
+            openai_client = OpenAIClient()
+            if openai_client.is_available():
+                self.clients['openai'] = openai_client
+                logger.info("🤖 OpenAI client ready")
+        except Exception as e:
+            logger.warning(f"⚠️ Skipping OpenAI client initialization: {e}")
     
     def _setup_priority(self):
         """Setup client priority (Gemini first, OpenAI as fallback)"""

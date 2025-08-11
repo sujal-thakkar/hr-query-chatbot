@@ -1,0 +1,28 @@
+# render.yaml - Blueprint for deploying the HR Chatbot on Render
+
+services:
+  # Backend Service (FastAPI)
+  - type: web
+    name: backend
+    env: docker
+    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: repo URL
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        fromSecret: true
+      - key: OPENAI_API_KEY
+        fromSecret: true
+
+  # Frontend Service (Streamlit)
+  - type: web
+    name: frontend
+    env: docker
+    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: repo URL
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: API_BASE
+        fromService:
+          type: web
+          name: backend
+          property: url

@@ -17,3 +17,9 @@ requests>=2.31.0
 
 # Production server
 gunicorn>=21.2.0
+
+# Optional caching
+redis>=5.0.0
+
+# Optional vector index
+faiss-cpu>=1.8.0

@@ -1,26 +1,67 @@
 version: '3.8'
 
 services:
-  hr-chatbot:
-    build: .
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"  # Backend API
-      - "8501:8501"  # Streamlit Frontend
+      - "8000:8000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - HOST=0.0.0.0
-      - PORT=8000
+      # Cache backend (auto|redis|memory). With Redis service below, 'auto' will use Redis.
+      - CACHE_BACKEND=${CACHE_BACKEND:-auto}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
-      - ./dataset:/app/dataset:ro  # Read-only dataset mount
+      - ./dataset:/app/dataset:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 30s
+    networks:
+      - hr-chatbot-network
+    depends_on:
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      # The backend is now reachable via its service name 'backend' on the Docker network
+      - API_BASE=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - hr-chatbot-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: hr-chatbot-redis
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hr-chatbot-network
 
 networks:
-  default:
-    name: hr-chatbot-network
+  hr-chatbot-network:
+    driver: bridge
+
+volumes:
+  redis-data:
