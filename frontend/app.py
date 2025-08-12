@@ -569,3 +569,24 @@ with col2:
         st.rerun()
 with col3:
     st.markdown(f"**API Status:** {API_BASE}")
+
+# Extended footer with developer attribution & social links
+current_year = time.strftime("%Y")
+DEV_GITHUB = os.getenv("DEV_GITHUB_URL", "https://github.com/sujal-thakkar")
+DEV_LINKEDIN = os.getenv("DEV_LINKEDIN_URL", "https://www.linkedin.com/in/sujal-thakkar-ab8432261")
+DEV_X = os.getenv("DEV_X_URL", "https://x.com/Sujal5Thakkar")
+DEV_INSTAGRAM = os.getenv("DEV_INSTAGRAM_URL", "https://www.instagram.com/sujalxdev")
+
+st.markdown("---")
+st.markdown(
+    f"""
+<div style='text-align:center; font-size:0.9rem;'>
+<strong>© {current_year} HR Query Chatbot</strong> • Developed by Sujal Thakkar using FastAPI, Streamlit & Gemini<br/>
+<a href='{DEV_GITHUB}' target='_blank'>GitHub</a> |
+<a href='{DEV_LINKEDIN}' target='_blank'>LinkedIn</a> |
+<a href='{DEV_X}' target='_blank'>X</a> |
+<a href='{DEV_INSTAGRAM}' target='_blank'>Instagram</a>
+</div>
+""",
+    unsafe_allow_html=True
+)
