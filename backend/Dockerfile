@@ -11,12 +11,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc curl libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend requirements and install dependencies
-COPY requirements.txt .
+# Copy backend requirements (explicit path to avoid picking up root requirements.txt)
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code and shared dataset
-COPY . .
+# Copy only backend source code (not the entire repo)
+COPY backend/ ./
 
 # Create non-root user and required dirs before switching
 RUN useradd --create-home --shell /bin/bash app \
