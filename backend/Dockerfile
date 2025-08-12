@@ -18,6 +18,7 @@ COPY . .
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash app \
+    && mkdir -p /app/data \
     && chown -R app:app /app
 USER app
 

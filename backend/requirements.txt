@@ -23,3 +23,6 @@ redis>=5.0.0
 
 # Optional vector index
 faiss-cpu>=1.8.0
+
+# Metrics / Monitoring
+prometheus-client>=0.20.0

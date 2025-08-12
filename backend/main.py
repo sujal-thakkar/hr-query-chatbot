@@ -1,12 +1,14 @@
 # backend/main.py
-import os, json, uvicorn, time
+import os, json, uvicorn, time, uuid
 from typing import List
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 from pathlib import Path
 from dotenv import load_dotenv
-from config import CHAT_RATE_LIMIT, HEALTH_RATE_LIMIT, ROOT_RATE_LIMIT, RAG_STATUS_RATE_LIMIT, SEARCH_RATE_LIMIT, DEBUG_EMPLOYEES_RATE_LIMIT, MIN_TOP_K, MAX_TOP_K, ALLOWED_ORIGINS
+from db import ensure_db_with_data, load_employees_from_db
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from config import CHAT_RATE_LIMIT, HEALTH_RATE_LIMIT, ROOT_RATE_LIMIT, RAG_STATUS_RATE_LIMIT, SEARCH_RATE_LIMIT, DEBUG_EMPLOYEES_RATE_LIMIT, MIN_TOP_K, MAX_TOP_K, ALLOWED_ORIGINS, DB_PATH as CFG_DB_PATH, DATASET_JSON_PATH
 from logging_config import setup_logging
 
 # Rate limiting imports
@@ -46,9 +48,23 @@ if ai_client and ai_client.is_available():
 else:
     print("⚠️ No AI clients available. Some features may be limited.")
 
-DATA_PATH = Path("/app/dataset/employees.json")
-with open(DATA_PATH) as f:
-    DATA = json.load(f)["employees"]
+JSON_DATA_PATH = Path(DATASET_JSON_PATH)
+DB_PATH = Path(CFG_DB_PATH)
+
+# Ensure SQLite exists and seed from JSON if empty; fallback to JSON on failure
+try:
+    ensure_db_with_data(DB_PATH, JSON_DATA_PATH)
+    DATA = load_employees_from_db(DB_PATH)
+    if not DATA and JSON_DATA_PATH.exists():
+        with open(JSON_DATA_PATH, encoding="utf-8") as f:
+            DATA = json.load(f).get("employees", [])
+        print("ℹ️ Using JSON dataset fallback (DB empty)")
+    else:
+        print(f"✅ Loaded {len(DATA)} employees from SQLite at {DB_PATH}")
+except Exception as e:
+    print(f"⚠️ SQLite load failed, falling back to JSON: {e}")
+    with open(JSON_DATA_PATH, encoding="utf-8") as f:
+        DATA = json.load(f).get("employees", [])
 
 # Initialize RAG system
 from rag import EmployeeRAG
@@ -65,6 +81,62 @@ except Exception as e:
     rag_system = None
 
 app = FastAPI(title="HR Resource Query Chatbot")
+
+# ----------------------------------------------------------------------------
+# Request ID & Metrics
+# ----------------------------------------------------------------------------
+REQUEST_ID_HEADER = "X-Request-ID"
+
+http_requests_total = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "path", "status"]
+)
+
+http_request_duration_seconds = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request latency in seconds",
+    ["method", "path"],
+    buckets=(0.005,0.01,0.025,0.05,0.1,0.25,0.5,1,2,5)
+)
+
+@app.middleware("http")
+async def add_request_id_and_metrics(request: Request, call_next):
+    start = time.time()
+    request_id = request.headers.get(REQUEST_ID_HEADER) or str(uuid.uuid4())
+    # Attach to state for handlers to use
+    request.state.request_id = request_id
+    response: Response | None = None
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        duration = time.time() - start
+        # Ensure response exists
+        if response is None:
+            response = Response(status_code=500)
+        response.headers[REQUEST_ID_HEADER] = request_id
+        path = request.url.path
+        # Aggregate dynamic paths to reduce label cardinality
+        if path.startswith("/chat"):
+            path_label = "/chat"
+        elif path.startswith("/employees/search"):
+            path_label = "/employees/search"
+        elif path.startswith("/system/rag-status"):
+            path_label = "/system/rag-status"
+        elif path.startswith("/debug/employees"):
+            path_label = "/debug/employees"
+        elif path == "/health":
+            path_label = "/health"
+        else:
+            path_label = path if len(path) < 32 else path[:32]
+        http_requests_total.labels(request.method, path_label, str(response.status_code)).inc()
+        http_request_duration_seconds.labels(request.method, path_label).observe(duration)
+
+
+@app.get("/metrics")
+async def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 # Add rate limiting
 app.state.limiter = limiter

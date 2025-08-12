@@ -41,3 +41,11 @@ FAISS_ENABLED = os.getenv("FAISS_ENABLED", "true").lower() in ("1", "true", "yes
 FAISS_INDEX_FILE = os.getenv("FAISS_INDEX_FILE", "employee_faiss.index")
 FAISS_META_FILE = os.getenv("FAISS_META_FILE", "employee_faiss.json")
 FAISS_METRIC = os.getenv("FAISS_METRIC", "ip")  # ip (inner product) or l2
+
+# SQLite database configuration
+DB_DIR = os.getenv("DB_DIR", "/app/data")
+DB_FILE = os.getenv("DB_FILE", "employees.db")
+DB_PATH = os.path.join(DB_DIR, DB_FILE)
+
+# JSON dataset fallback path
+DATASET_JSON_PATH = os.getenv("DATASET_JSON_PATH", "/app/dataset/employees.json")

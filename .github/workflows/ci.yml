@@ -1,46 +1,10 @@
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-      - name: Static import check
-        run: |
-          python -c "import importlib;import sys;mods=['fastapi','pydantic','numpy'];[importlib.import_module(m) for m in mods];print('Imports OK')"
-      - name: Run lightweight tests (no external APIs)
-        run: |
-          python - << 'PY'
-          import sys, json
-          sys.path.append('backend')
-          from query_processor import QueryProcessor
-          qp = QueryProcessor()
-          res = qp.process_query('Senior Python developer with 5+ years ML experience in healthcare')
-          assert 'python' in [s.lower() for s in res.skill_terms]
-          assert 'healthcare' in res.domain_context
-          print('QueryProcessor sanity test passed')
-          PY
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -50,95 +14,95 @@ jobs:
         python-version: [3.8, 3.9, "3.10", "3.11"]
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Cache pip dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio
-    
-    - name: Lint with flake8
-      run: |
-        # Install flake8 if not already installed
-        pip install flake8
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 backend/ frontend/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 backend/ frontend/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
-    - name: Test with pytest
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: |
-        # Run basic tests that don't require API keys
-        python tests/simple_test.py || true
-        # Run tests with pytest if available
-        pytest tests/ -v --tb=short || true
-      continue-on-error: true
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Lint with flake8
+        run: |
+          # Install flake8 if not already installed
+          pip install flake8
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 backend/ frontend/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 backend/ frontend/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Test with pytest
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Run basic tests that don't require API keys
+          python tests/simple_test.py || true
+          # Run tests with pytest if available
+          pytest tests/ -v --tb=short || true
+        continue-on-error: true
 
   security:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install bandit safety
-        pip install -r requirements.txt
-    
-    - name: Run security checks with bandit
-      run: |
-        bandit -r backend/ -f json -o bandit-report.json || true
-    
-    - name: Check for known vulnerabilities
-      run: |
-        safety check || true
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety
+          pip install -r requirements.txt
+
+      - name: Run security checks with bandit
+        run: |
+          bandit -r backend/ -f json -o bandit-report.json || true
+
+      - name: Check for known vulnerabilities
+        run: |
+          safety check || true
 
   build:
     runs-on: ubuntu-latest
     needs: [test, security]
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Verify application starts
-      run: |
-        # Start backend in background
-        python backend/main.py &
-        sleep 10
-        # Test if it's responding
-        curl -f http://localhost:8000/health || exit 1
-        # Kill background process
-        pkill -f "python backend/main.py" || true
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify application starts
+        run: |
+          # Start backend in background
+          python backend/main.py &
+          sleep 10
+          # Test if it's responding
+          curl -f http://localhost:8000/health || exit 1
+          # Kill background process
+          pkill -f "python backend/main.py" || true
