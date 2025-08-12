@@ -323,6 +323,41 @@ docker compose down -v
 - **AWS/GCP**: Compatible with container services
 - **Railway**: One-click deployment ready
 
+### Render Blueprint Deployment (Recommended for this repo)
+
+This repository includes a `render.yaml` that defines two Docker services (backend + frontend).
+
+Steps:
+1. Fork or push the repo to your own GitHub account (avoid storing real secrets).
+2. Remove any accidental committed secrets. The file `backend/.env` should NOT exist (use `backend/.env.example`).
+3. In the Render dashboard choose: New > Blueprint > select the repo.
+4. Render parses `render.yaml`. It will create services named `backend` and `frontend`.
+5. Before first deploy, set the environment variables for each service:
+  - `GEMINI_API_KEY` (required for AI features)
+  - `OPENAI_API_KEY` (optional fallback)
+  - Any overrides (`CACHE_BACKEND`, `REDIS_URL`, etc.)
+6. Trigger the deploy. Watch build logs. (Expected build time: ~1–2 min on free tier.)
+7. Verify the backend health endpoint:
+  - `https://<backend-service>.onrender.com/health` should return `{"status":"healthy"}`
+8. Open the frontend URL. Chat should function; if AI keys missing you'll see a degraded mode warning in backend logs.
+
+Common Issues & Fixes:
+| Problem | Cause | Resolution |
+|---------|-------|-----------|
+| `chown: invalid user 'app:app'` | Dockerfile attempted chown before user creation | Fixed by creating user first (already updated) |
+| `dockerfile parse error unknown instruction` | Multi-line RUN broken by newline without `\` | Fixed in backend Dockerfile |
+| Healthcheck failing | curl missing in slim image | Added `curl` to backend Dockerfile |
+| FAISS import error | Missing `libgomp` | Added `libgomp1` to backend Dockerfile |
+| Missing API keys warning | Keys not set in Render env | Add them via Render dashboard > Environment |
+
+Re-deploy: push to `main` or click Manual Deploy in the service menu.
+
+Local `.env` setup:
+```
+cp backend/.env.example backend/.env
+```
+Fill values; never commit the populated file.
+
 ## 🤝 **Contributing**
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.

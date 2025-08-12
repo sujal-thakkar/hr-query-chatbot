@@ -13,13 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy frontend code
 COPY . .
 
-# Ensure .streamlit directory exists and is owned by 'app' user
-RUN mkdir -p /app/.streamlit && \
-    chown -R app:app /app/.streamlit
-
-# Create non-root user for security
+# Create non-root user and prepare .streamlit before switching
 RUN useradd --create-home --shell /bin/bash app \
+    && mkdir -p /app/.streamlit \
     && chown -R app:app /app
+
 USER app
 
 
