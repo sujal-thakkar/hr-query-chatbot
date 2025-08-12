@@ -28,5 +28,8 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     plan: free # <--- ADD THIS LINE
     envVars:
+      # Use the public backend host over HTTPS (Render terminates TLS). Port not needed for 443.
       - key: API_BASE
-        value: http://${backend.host}:${backend.port} # Correct way to reference backend service
+        value: https://${backend.host}
+        # NOTE: If you prefer internal networking (same region) you can test with http://${backend.host}:${backend.port}
+        # but some setups expose only the public hostname. Using https without port is most robust.

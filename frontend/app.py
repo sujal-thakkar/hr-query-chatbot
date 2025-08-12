@@ -151,8 +151,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Get API base URL
-API_BASE = os.getenv("API_BASE", "http://localhost:8000")
+# Get API base URL (support Render service linkage and fallback)
+API_BASE = os.getenv("API_BASE", "http://localhost:8000").rstrip("/")
+
+# Auto-correct common container hostname patterns when deployed publicly
+render_service_name = os.getenv("RENDER_SERVICE_NAME")
+public_hostname = os.getenv("RENDER_EXTERNAL_URL")  # Render sets this env var on services
+if public_hostname:
+    public_hostname = public_hostname.rstrip('/')
+
+# If API_BASE still points to internal 'http://backend:8000' but we have a public hostname for backend, switch to https
+if API_BASE.startswith("http://backend:8000") and public_hostname:
+    # If this is the frontend service and the backend host differs, rely on configured env var instead
+    API_BASE = os.getenv("PUBLIC_BACKEND_URL", public_hostname)
+
+# Ensure scheme
+if not API_BASE.startswith("http://") and not API_BASE.startswith("https://"):
+    API_BASE = f"https://{API_BASE}"
 
 # Initialize session state
 if 'search_history' not in st.session_state:
