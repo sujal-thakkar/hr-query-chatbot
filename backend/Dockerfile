@@ -16,7 +16,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code and shared dataset
 COPY . .
 
+# --- NEW LINES: Ensure data and cache directories exist and are owned by 'app' user ---
+RUN mkdir -p /app/data && 
+    mkdir -p /app/.cache && 
+    chown -R app:app /app/data && 
+    chown -R app:app /app/.cache
+# --- END NEW LINES ---
+
 # Create non-root user for security
+
 RUN useradd --create-home --shell /bin/bash app \
     && mkdir -p /app/data \
     && chown -R app:app /app
