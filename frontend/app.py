@@ -151,23 +151,45 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Get API base URL (support Render service linkage and fallback)
-API_BASE = os.getenv("API_BASE", "http://localhost:8000").rstrip("/")
+# ---- Backend API Base Resolution Logic ----
+# Precedence (highest -> lowest):
+# 1. PUBLIC_BACKEND_URL env (explicit override)
+# 2. BACKEND_PUBLIC_URL env (alias)
+# 3. API_BASE env (from Render blueprint)
+# 4. Streamlit secrets API_BASE (local override)
+# 5. Fallback http://localhost:8000
 
-# Auto-correct common container hostname patterns when deployed publicly
-render_service_name = os.getenv("RENDER_SERVICE_NAME")
-public_hostname = os.getenv("RENDER_EXTERNAL_URL")  # Render sets this env var on services
-if public_hostname:
-    public_hostname = public_hostname.rstrip('/')
+secret_api_base = None
+try:
+    if 'API_BASE' in st.secrets:  # type: ignore[attr-defined]
+        secret_api_base = str(st.secrets['API_BASE']).strip()  # type: ignore[index]
+except Exception:
+    secret_api_base = None
 
-# If API_BASE still points to internal 'http://backend:8000' but we have a public hostname for backend, switch to https
-if API_BASE.startswith("http://backend:8000") and public_hostname:
-    # If this is the frontend service and the backend host differs, rely on configured env var instead
-    API_BASE = os.getenv("PUBLIC_BACKEND_URL", public_hostname)
+candidate_api_base = (
+    os.getenv("PUBLIC_BACKEND_URL")
+    or os.getenv("BACKEND_PUBLIC_URL")
+    or os.getenv("API_BASE")
+    or secret_api_base
+    or "http://localhost:8000"
+)
 
-# Ensure scheme
-if not API_BASE.startswith("http://") and not API_BASE.startswith("https://"):
+API_BASE = candidate_api_base.rstrip("/")
+
+# If internal docker-style hostname is present and a public override exists, use override only (do not swap with frontend's own URL)
+if API_BASE in ("http://backend:8000", "backend:8000"):
+    override = os.getenv("PUBLIC_BACKEND_URL") or os.getenv("BACKEND_PUBLIC_URL")
+    if override:
+        API_BASE = override.rstrip("/")
+
+# Ensure scheme (default to https for bare hostnames)
+if not API_BASE.startswith(("http://", "https://")):
     API_BASE = f"https://{API_BASE}"
+
+# Simple sanity warning for user visibility if we still point to localhost or internal backend name in production
+if os.getenv("RENDER") == "true" and any(x in API_BASE for x in ("localhost", "backend:8000")):
+    st.warning(f"API_BASE appears to be '{API_BASE}'. Set PUBLIC_BACKEND_URL in frontend service env to your backend public URL (e.g. https://your-backend.onrender.com).")
+# ---- End resolution logic ----
 
 # Initialize session state
 if 'search_history' not in st.session_state:
