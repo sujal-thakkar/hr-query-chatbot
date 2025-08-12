@@ -5,24 +5,35 @@ services:
   - type: web
     name: backend
     env: docker
-    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: repo URL
+    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: Update this to your repo URL
     dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /health
     envVars:
+      # These keys will be set as environment variables in Render's dashboard.
+      # Render will automatically treat them as secrets if their values are sensitive.
       - key: GEMINI_API_KEY
-        fromSecret: true
+        # value: <YOUR_GEMINI_API_KEY_VALUE_HERE> # DO NOT COMMIT REAL KEYS HERE! Set in Render UI.
       - key: OPENAI_API_KEY
-        fromSecret: true
+        # value: <YOUR_OPENAI_API_KEY_VALUE_HERE> # DO NOT COMMIT REAL KEYS HERE! Set in Render UI.
+      # Cache backend (auto|redis|memory). With Redis service below, 'auto' will use Redis.
+      - key: CACHE_BACKEND
+        value: auto # Or 'redis' if you explicitly want to use Redis
+      # If you want to use Render's managed Redis, you'd create it separately
+      # and then set REDIS_URL manually in the backend service's environment variables.
+      # - key: REDIS_URL
+      #   fromService:
+      #     type: redis
+      #     name: your-redis-service-name # Replace with the actual name of your Render Redis service
+      #     property: connectionString
 
   # Frontend Service (Streamlit)
   - type: web
     name: frontend
     env: docker
-    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: repo URL
+    repo: https://github.com/sujal-thakkar/hr-query-chatbot # <-- IMPORTANT: Update this to your repo URL
     dockerfilePath: ./frontend/Dockerfile
     envVars:
       - key: API_BASE
-        fromService:
-          type: web
-          name: backend
-          property: url
+        value: http://${backend.host}:${backend.port} # Correct way to reference backend service
+        # Alternatively, if you want to use the external URL for the frontend to call the backend:
+        # value: ${backend.url} # This would be the public URL of the backend service
