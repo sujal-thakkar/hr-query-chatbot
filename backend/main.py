@@ -152,6 +152,7 @@ app.add_middleware(
 )
 
 @app.get("/health")
+@app.head("/health")  # Add HEAD support for UptimeRobot
 @limiter.limit(HEALTH_RATE_LIMIT)
 async def health_check(request: Request, detailed: bool = False):
     """Health check endpoint with optional detailed information"""
@@ -204,6 +205,7 @@ async def debug_employees(request: Request):
     return {"total_employees": len(DATA), "employees": DATA[:3]}  # Return first 3 for testing
 
 @app.get("/")
+@app.head("/")  # Add HEAD support for UptimeRobot
 @limiter.limit(ROOT_RATE_LIMIT)
 async def root_health_check(request: Request):
     return {"status": "healthy", "message": "HR Resource Query Chatbot API is running"}
