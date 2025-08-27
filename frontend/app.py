@@ -98,6 +98,93 @@ st.markdown("""
         scroll-margin-top: 20px;
     }
     
+    /* Auto-scroll target styling */
+    #results-anchor {
+        scroll-margin-top: 80px;
+        padding-top: 20px;
+    }
+    
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Loading animation for results */
+    .results-loading {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Scroll indicator */
+    .scroll-indicator {
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        background: #1f77b4;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-size: 14px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .scroll-indicator i {
+        margin-right: 8px;
+        animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-5px); }
+        60% { transform: translateY(-3px); }
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #1f77b4;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        display: none;
+    }
+    
+    .back-to-top:hover {
+        background: #1565c0;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .back-to-top.show {
+        display: block;
+        animation: fadeInUp 0.3s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
     /* Professional Icon Styles */
     .icon-professional {
         margin-right: 8px;
@@ -400,6 +487,38 @@ if search_button:
     # Set flag to show results section and trigger scroll
     st.session_state.show_results = True
     st.session_state.scroll_to_results = True
+    
+    # Add immediate scroll trigger using JavaScript
+    st.markdown("""
+    <script>
+        // Show scroll indicator
+        function showScrollIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'scroll-indicator';
+            indicator.innerHTML = '<i class="fas fa-arrow-down"></i>Scrolling to results...';
+            indicator.id = 'scroll-indicator';
+            document.body.appendChild(indicator);
+            
+            // Remove indicator after 2 seconds
+            setTimeout(() => {
+                const elem = document.getElementById('scroll-indicator');
+                if (elem) elem.remove();
+            }, 2000);
+        }
+        
+        // Immediate scroll to results section
+        setTimeout(function() {
+            showScrollIndicator();
+            const resultsAnchor = document.getElementById('results-anchor');
+            if (resultsAnchor) {
+                resultsAnchor.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 100);
+    </script>
+    """, unsafe_allow_html=True)
         
     # Validate query
     is_valid, error_message = validate_query(query)
@@ -456,15 +575,15 @@ if search_button:
                 # Add to search history
                 add_to_search_history(query, len(candidates))
                 
+                # Add results anchor for auto-scroll (place before results)
+                st.markdown('<div id="results-anchor" class="results-loading"></div>', unsafe_allow_html=True)
+                
                 # Display results
                 if candidates:
                     st.success(f"✅ **Found {len(candidates)} matching candidate(s)!**")
                     
                     # Clear the input field for next search
                     st.session_state.clear_input = True
-                    
-                    # Add results marker for auto-scroll
-                    st.markdown('<div id="results-marker"></div>', unsafe_allow_html=True)
                     
                     # Display assistant response if available
                     if data.get("message"):
@@ -523,41 +642,72 @@ if search_button:
                 st.code(f"Error type: {type(e).__name__}")
                 st.code(f"Error details: {str(e)}")
 
-# Results section - with auto-scroll functionality
-if st.session_state.show_results:
-    # Add scroll trigger when results are shown
-    if st.session_state.scroll_to_results:
-        # Use HTML/JS for immediate scroll after content loads
-        st.markdown("""
-        <script>
-            // Multiple attempts to scroll with different timing
-            function scrollToResults() {
-                const marker = document.getElementById('results-marker');
-                if (marker) {
-                    marker.scrollIntoView({
+# Results section - with enhanced auto-scroll functionality
+if st.session_state.show_results and st.session_state.scroll_to_results:
+    # Enhanced scroll implementation with multiple fallbacks
+    st.markdown("""
+    <script>
+        function scrollToResults() {
+            const anchor = document.getElementById('results-anchor');
+            if (anchor) {
+                // Method 1: scrollIntoView (modern browsers)
+                try {
+                    anchor.scrollIntoView({
                         behavior: 'smooth',
-                        block: 'start'
+                        block: 'start',
+                        inline: 'nearest'
                     });
                     return true;
+                } catch (e) {
+                    // Method 2: Fallback for older browsers
+                    try {
+                        anchor.scrollIntoView(true);
+                        return true;
+                    } catch (e2) {
+                        // Method 3: Manual scroll calculation
+                        const rect = anchor.getBoundingClientRect();
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        const targetY = rect.top + scrollTop - 80; // 80px offset from top
+                        
+                        window.scrollTo({
+                            top: targetY,
+                            behavior: 'smooth'
+                        });
+                        return true;
+                    }
                 }
-                return false;
             }
-            
-            // Try multiple times with increasing delays
-            setTimeout(scrollToResults, 100);
-            setTimeout(scrollToResults, 500);
-            setTimeout(scrollToResults, 1000);
-            
-            // Also try after document is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', scrollToResults);
-            } else {
-                scrollToResults();
+            return false;
+        }
+        
+        // Multiple timing attempts for reliability
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryScroll() {
+            if (scrollToResults() || attempts >= maxAttempts) {
+                return;
             }
-        </script>
-        """, unsafe_allow_html=True)
-        # Reset scroll flag
-        st.session_state.scroll_to_results = False
+            attempts++;
+            setTimeout(tryScroll, 200 * attempts); // Increasing delay
+        }
+        
+        // Start scrolling attempts
+        setTimeout(tryScroll, 100);
+        
+        // Also try when DOM is fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tryScroll);
+        }
+        
+        // Try again after Streamlit finishes rendering
+        setTimeout(tryScroll, 1000);
+        setTimeout(tryScroll, 2000);
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Reset scroll flag after triggering
+    st.session_state.scroll_to_results = False
 
 # Footer
 st.markdown("---")
@@ -587,6 +737,39 @@ st.markdown(
 <a href='{DEV_X}' target='_blank'>X</a> |
 <a href='{DEV_INSTAGRAM}' target='_blank'>Instagram</a>
 </div>
+
+<!-- Back to Top Button -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+// Back to top functionality
+function scrollToTop() {{
+    window.scrollTo({{
+        top: 0,
+        behavior: 'smooth'
+    }});
+}}
+
+// Show/hide back to top button based on scroll position
+function toggleBackToTop() {{
+    const button = document.getElementById('backToTop');
+    if (button) {{
+        if (window.pageYOffset > 300) {{
+            button.classList.add('show');
+        }} else {{
+            button.classList.remove('show');
+        }}
+    }}
+}}
+
+// Add scroll listener
+window.addEventListener('scroll', toggleBackToTop);
+
+// Initial check
+toggleBackToTop();
+</script>
 """,
     unsafe_allow_html=True
 )
