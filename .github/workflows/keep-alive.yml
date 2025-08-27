@@ -1,0 +1,37 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Run every 5 minutes during business hours (6 AM - 10 PM UTC)
+    # This helps conserve Render's 750 free hours per month
+    - cron: '*/5 6-22 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Endpoint
+        run: |
+          echo "🏥 Pinging backend health endpoint..."
+          echo "⏰ Current time: $(date)"
+          
+          # Ping with timeout and retry logic
+          for i in {1..3}; do
+            echo "📡 Attempt $i/3"
+            if curl -f -m 60 -s https://backend-aohf.onrender.com/health; then
+              echo "✅ Backend is healthy!"
+              exit 0
+            else
+              echo "⚠️ Attempt $i failed, waiting 10 seconds..."
+              sleep 10
+            fi
+          done
+          
+          echo "❌ All attempts failed - backend might be having issues"
+          exit 1
+          
+      - name: Log Results
+        if: always()
+        run: |
+          echo "📊 Keep-alive job completed at $(date)"

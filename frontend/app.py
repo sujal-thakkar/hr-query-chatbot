@@ -411,10 +411,10 @@ if search_button:
     # Rate limiting
     st.session_state.last_search_time = time.time()
     
-    with st.spinner("Searching for candidates..."):
+    with st.spinner("Connecting to backend... (This may take up to 60 seconds if the server is sleeping)"):
         try:
-            # Test backend connection first with timeout
-            health_resp = requests.get(f"{API_BASE}/health", timeout=5)
+            # Test backend connection first with timeout (longer for Render cold starts)
+            health_resp = requests.get(f"{API_BASE}/health", timeout=60)
             if health_resp.status_code != 200:
                 st.error("❌ **Backend server is not responding.** Please make sure it's running.")
                 st.code("cd backend && python main.py", language="bash")
