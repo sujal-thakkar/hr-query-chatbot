@@ -1,4 +1,4 @@
-# 🤖 HR Query Chatbot
+# HR Query Chatbot
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -7,7 +7,7 @@
 
 An intelligent HR assistant powered by **Google Gemini AI** that helps HR teams find the perfect candidates using natural language queries. The system combines semantic search with AI-generated insights to match candidates based on skills, experience, and project history.
 
-## 🚀 What's New (v2+ Enhancements)
+## What's New (v2+ Enhancements)
 
 Recent improvements (reflected in code, newly documented here):
 
@@ -25,30 +25,30 @@ Recent improvements (reflected in code, newly documented here):
 
 > These make the project more production-ready (observability, resilience, persistence) while retaining simple local setup.
 
-## ✨ Features
+## Features
 
-### 🔍 **Intelligent Search**
+### **Intelligent Search**
 - **Semantic Search**: Powered by Gemini embeddings for context-aware candidate matching
 - **Natural Language Queries**: Ask questions like "Find someone with ML experience for healthcare"
 - **Multi-factor Scoring**: Combines skill matching, experience, and domain relevance
 
-### 🤖 **AI-Powered Insights**
+### **AI-Powered Insights**
 - **Gemini 2.5 Flash**: Lightning-fast AI responses with detailed candidate analysis
 - **Personalized Recommendations**: AI explains why each candidate is a perfect fit
 - **Conversational Interface**: Natural, recruiter-like responses
 
-### 🛡️ **Enterprise-Ready**
+### **Enterprise-Ready**
 - **Rate Limiting**: Configurable API rate limits for production use
 - **Input Validation**: XSS protection and secure input handling
 - **Error Handling**: Graceful fallbacks and detailed error reporting
 - **Health Monitoring**: Comprehensive system health endpoints
 
-### 📊 **Advanced Analytics**
+### **Advanced Analytics**
 - **Match Confidence**: AI-calculated confidence scores for each match
 - **Detailed Reasoning**: Explains why candidates match your requirements
 - **Performance Metrics**: Track search accuracy and response times
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 graph TB
